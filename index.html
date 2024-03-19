@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="column" id="todo-column">
+            <h2>To Do</h2>
+            <div class="task-list" id="todo-list" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+            <form id="add-todo-form">
+                <input type="text" id="todo-input" placeholder="Add a new task">
+                <button type="submit">Add</button>
+            </form>
+        </div>
+        <div class="column" id="in-progress-column">
+            <h2>In Progress</h2>
+            <div class="task-list" id="in-progress-list" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+        <div class="column" id="done-column">
+            <h2>Done</h2>
+            <div class="task-list" id="done-list" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
