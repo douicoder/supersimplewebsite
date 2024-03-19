@@ -1,31 +1,56 @@
-let draggedTask;
+const socket = io('wss://echo.websocket.org');
 
-function allowDrop(event) {
-    event.preventDefault();
+// Function to render tasks
+function renderTask(task) {
+    const taskElement = document.createElement('div');
+    taskElement.className = 'task';
+    taskElement.textContent = task.text;
+    taskElement.draggable = true;
+
+    // Add drag event listeners
+    taskElement.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', task.text);
+    });
+
+    document.getElementById(task.status + '-list').appendChild(taskElement);
 }
 
-function drag(event) {
-    draggedTask = event.target;
-}
+// Listen for tasks from the server
+socket.on('tasks', (tasks) => {
+    document.querySelectorAll('.task-list').forEach((list) => {
+        list.innerHTML = '';
+    });
 
-function drop(event) {
-    event.preventDefault();
-    if (event.target.className === 'task-list') {
-        event.target.appendChild(draggedTask);
-    }
-}
+    tasks.forEach((task) => {
+        renderTask(task);
+    });
+});
 
-document.getElementById('add-todo-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    let input = document.getElementById('todo-input');
-    let taskText = input.value.trim();
+// Listen for form submission
+document.getElementById('add-todo-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const input = document.getElementById('todo-input');
+    const taskText = input.value.trim();
+
     if (taskText !== '') {
-        let task = document.createElement('div');
-        task.className = 'task';
-        task.draggable = true;
-        task.textContent = taskText;
-        task.addEventListener('dragstart', drag);
-        document.getElementById('todo-list').appendChild(task);
+        // Send task to the server
+        socket.emit('addTask', { text: taskText, status: 'todo' });
         input.value = '';
     }
+});
+
+// Allow dropping tasks
+document.querySelectorAll('.task-list').forEach((list) => {
+    list.addEventListener('dragover', (e) => {
+        e.preventDefault();
+    });
+
+    list.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const taskText = e.dataTransfer.getData('text/plain');
+        const status = list.id.replace('-list', '');
+
+        // Move task
+        socket.emit('moveTask', { text: taskText, status: status });
+    });
 });
